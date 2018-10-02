@@ -1,31 +1,82 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+  <div>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Auth0 - Vue</a>
+
+          <router-link :to="'/'"
+            class="btn btn-primary btn-margin">
+              Home
+          </router-link>
+
+          <button
+            class="btn btn-primary btn-margin"
+            v-if="!authenticated"
+            @click="login()">
+              Log In
+          </button>
+
+          <button
+            class="btn btn-primary btn-margin"
+            v-if="authenticated"
+            @click="logout()">
+              Log Out
+          </button>
+
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+        <!-- Passes auth, authenticated as a prop to all views -->
+      <router-view 
+        :auth="auth" 
+        :authenticated="authenticated">
+      </router-view>
     </div>
-    <router-view/>
   </div>
 </template>
 
+<script>
+
+import AuthService from './Auth/AuthService'
+
+const auth = new AuthService()
+
+const { login, logout, authenticated, authNotifier } = auth
+
+export default {
+  name: 'app',
+  data () {
+    authNotifier.on('authChange', authState => {
+      this.authenticated = authState.authenticated
+    })
+    return {
+      auth,
+      authenticated
+    }
+  },
+  methods: {
+    login,
+    logout
+  }
+}
+</script>
+
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+/* @import '../node_modules/bootstrap/dist/css/bootstrap.css'; */
+.btn-margin {
+  margin-top: 7px
 }
-#nav {
-  padding: 30px;
+.navbar {
+  display: flex;
+  justify-content: center;
 }
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+button {
+  padding: 1em;
+  background: blue;
+  color: white;
 }
 </style>
+
